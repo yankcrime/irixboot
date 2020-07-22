@@ -10,20 +10,20 @@ IRIXVERS="$1"
 
 ### Partition/Format our data disk (will hold IRIX distribution)
 function formatdisk {
-	echo "Formatting /dev/sdb..."
+	echo "Formatting /dev/vdb..."
 	
-	if [ ! -e /dev/sdb1 ]
+	if [ ! -e /dev/vdb1 ]
 	then
-		parted /dev/sdb mklabel msdos
-		parted /dev/sdb mkpart primary 512 100%
-		partprobe /dev/sdb
+		parted /dev/vdb mklabel msdos
+		parted /dev/vdb mkpart primary 512 100%
+		partprobe /dev/vdb
 		sleep 5
 	fi
 	
-	mkfs.xfs -f /dev/sdb1
+	mkfs.xfs -f /dev/vdb1
 	mkdir -p /irix 
 	sed -i '/\/irix/d' /etc/fstab
-	echo `blkid /dev/sdb1 | awk '{print$2}' | sed -e 's/"//g'` /irix xfs noatime,nobarrier 0 0 >> /etc/fstab
+	echo `blkid /dev/vdb1 | awk '{print$2}' | sed -e 's/"//g'` /irix xfs noatime,nobarrier 0 0 >> /etc/fstab
 	mount /irix
 	copydist
 }

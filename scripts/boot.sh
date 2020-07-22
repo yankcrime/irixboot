@@ -11,7 +11,7 @@ CLIENT_IP="$2"
 CLIENT_MAC="$3"
 DOMAIN="$4"
 NETMASK="$5"
-HOST_IP="$6"
+HOST_IP=$(/sbin/ip -o -4 addr list eth1 | awk '{print $4}' | cut -d/ -f1)
 
 ### Calculate network address
 ### http://stackoverflow.com/questions/15429420/given-the-ip-and-netmask-how-can-i-calculate-the-network-address-using-bash
@@ -22,8 +22,8 @@ NETWORK=$(printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$
 echo "Populating /etc/hosts, hosts.equiv, .rhosts..."
 cp /etc/hosts.irixboot /etc/hosts
 sed -i "s/\.raw/.$DOMAIN/" /etc/hosts
-echo $CLIENT_IP $CLIENT_NAME.$DOMAIN >> /etc/hosts
-echo $HOST_IP irixboot.$DOMAIN >> /etc/hosts
+echo $CLIENT_IP $CLIENT_NAME.$DOMAIN $CLIENT_NAME >> /etc/hosts
+echo $HOST_IP irixboot.$DOMAIN irixboot >> /etc/hosts
 su guest -c "echo $CLIENT_NAME.$DOMAIN root > ~/.rhosts"
 echo "$CLIENT_NAME" > /etc/hosts.equiv
 echo "irixboot" >> /etc/hosts.equiv
